@@ -35,8 +35,8 @@ class Rect:
 
         self.size = size
 
-class Object:
-    def __init__(self, *objects: pygame.Rect | pygame.Surface | Circle):
+class Group:
+    def __init__(self, *objects: pygame.Rect | pygame.Surface | Circle | Rect):
         pass
 
 SCREEN_WIDTH = 800
@@ -54,7 +54,7 @@ while True:
         screen.fill((3,6,22))
 
         pygame.draw.rect(screen, (75, 75, 75), playButton)
-        pygame.draw.circle()
+        # pygame.draw.circle()
 
         pygame.display.update()
         time.sleep(0.01)
