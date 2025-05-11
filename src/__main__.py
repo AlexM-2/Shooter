@@ -16,6 +16,13 @@ pygame.event.set_blocked(None) #None means all will be blocked
 for event in allowed_events:
     pygame.event.set_allowed(event)
 
+Vector2 = pygame.math.Vector2
+Color = pygame.color.Color
+
+default_size: Vector2 | None = None
+default_pos: Vector2 | None = None
+default_color: Color | None = None
+
 class Mouse_state(list):
 
     def __new__(cls, *args):
@@ -41,8 +48,8 @@ class Mouse_state(list):
         self.append(state[4])
 
 class Mouse:
-    def __init__(self, state: Mouse_state = pygame.mouse.get_pressed(5),  pos: pygame.Vector2 = pygame.mouse.get_pos()):
-        self.pos: pygame.Vector2 = pygame.Vector2(pos[0], pos[1])
+    def __init__(self, state: Mouse_state = pygame.mouse.get_pressed(5),  pos: Vector2 = pygame.mouse.get_pos()):
+        self.pos: Vector2 = Vector2(pos[0], pos[1])
 
         self.state: Mouse_state = Mouse_state(state)
 
@@ -119,49 +126,63 @@ class Border(list):
     #         self[3] = value
     #     super().__setattr__(name, value)
 
-    # def __delattr__(self, name):
-    #     if name == "border":
-    #         self.__init__(-1, self.top_left, self.top_right, self.bottom_left, self.bottom_right)
-    #     elif name == "top_left":
-    #         self.__init__(self.shortened, -1, self.top_right, self.bottom_left, self.bottom_right)
-    #     elif name == "top_right":
-    #         self.__init__(self.shortened, self.top_left, -1, self.bottom_left, self.bottom_right)
-    #     elif name == "bottom_left":
-    #         self.__init__(self.shortened, self.top_left, self.top_right, -1, self.bottom_right)
-    #     elif name == "bottom_right":
-    #         self.__init__(self.shortened, -1, self.top_right, self.bottom_left, -1)
-    #     elif name == "border":
-    #         self.__init__(-1, self.top_left, self.top_right, self.bottom_left, self.bottom_right)
-    #     else:
-    #         super().__delattr__(name)
+    def __delattr__(self, name):
+        if name == "border":
+            self.__init__(-1, self.top_left, self.top_right, self.bottom_left, self.bottom_right)
+        elif name == "top_left":
+            self.__init__(self.shortened, -1, self.top_right, self.bottom_left, self.bottom_right)
+        elif name == "top_right":
+            self.__init__(self.shortened, self.top_left, -1, self.bottom_left, self.bottom_right)
+        elif name == "bottom_left":
+            self.__init__(self.shortened, self.top_left, self.top_right, -1, self.bottom_right)
+        elif name == "bottom_right":
+            self.__init__(self.shortened, -1, self.top_right, self.bottom_left, -1)
+        elif name == "border":
+            self.__init__(-1, self.top_left, self.top_right, self.bottom_left, self.bottom_right)
+        else:
+            super().__delattr__(name)
 
-class Rect(pygame.Rect):
+class Sprite(pygame.sprite.Sprite):
     def __init__(
             self,
             surface: pygame.Surface,
-            color: pygame.Color,
-            size: pygame.Vector2,
-            pos: pygame.Vector2,
+            color: Color,
+            size: Vector2 = None,
+            pos: Vector2 = None,
             width: int = 0,
-            border: Border = Border()
+            border: Border = Border(),
+            *groups
             ):
         
-        super().__init__(pos, size)
+        if size == None:
+            if not default_size == None:
+                size = default_size
+            else:
+                raise TypeError("No value to bind size to. default_size = None, size = None")
+        if pos == None:
+            if not default_pos == None:
+                size = default_size
+            else:
+                raise TypeError("No value to bind size to. default_pos = None, pos = None")
+        
+        super().__init__(groups)
 
         self.surface: pygame.Surface = surface
-        self.color: pygame.Color = color
+        self.color: Color = color
 
         self.rect: pygame.Rect = pygame.Rect(pos, size)
-        self.size: pygame.Vector2 = size
-        self.pos: pygame.Vector2 = pos
+        self.size: Vector2 = size
+        self.pos: Vector2 = pos
 
         self.width: int = width
         self.border = border
+
+    
     
     def draw(
         self,
         surface: pygame.Surface | None = None,
-        color: pygame.Color | None = None,
+        color: Color | None = None,
         rect: pygame.Rect | None = None,
         width: int = None,
         border: Border | None = None,
@@ -217,27 +238,18 @@ class Rect(pygame.Rect):
             if not o_border_full.is_default:
                 short_in_func = False
                 default_in_func = False
-        
-        print(border)
-        print(o_border_full)
 
         #o is short for output
         match (short_in_func, default_in_func, o_width):
             case (True, True, 0):
-                print("176")
                 pygame.draw.rect(o_surface, o_color, o_rect)
             case (True, False, 0):
-                print("179")
                 pygame.draw.rect(o_surface, o_color, o_rect, border_radius=o_border_short)
             case (True, False, _):
-                print("182")
                 pygame.draw.rect(o_surface, o_color, o_rect, o_width, o_border_short)
             case (True, True, _):
-                print("185")
                 pygame.draw.rect(o_surface, o_color, o_rect, o_width)
             case (False, False, _):
-                print("191")
-                print(o_border_full[3])
                 pygame.draw.rect(o_surface,
                     o_color,
                     o_rect,
@@ -247,14 +259,20 @@ class Rect(pygame.Rect):
                     border_bottom_left_radius=o_border_full[2],
                     border_bottom_right_radius=o_border_full[3]
                 )
-
-#         print(f"139| <{self.color=}> <{self.rect=}> <{self.width=}> <{self.border=}> <{self.border.shortened=}>\n \
-# <{self.border.is_shortened=}> <{self.border.default=}> <{self.surface}>\n")
         return self
+
+class Group(pygame.sprite.Group):
+    def __init__(self, *sprites: Sprite):
+        super().__init__(sprites)
+    def draw(self):
+        for sprite in self:
+            sprite.draw()
 
 mouse = Mouse()
 
-playButton = Rect(screen, (255, 255, 255), (200, 100), (300, 500))
+play_button = Group(
+    Sprite(screen, (255, 255, 255), (200, 100), (300, 500), 10, Border(20))
+)
 
 while True:
 
@@ -300,7 +318,7 @@ while True:
                 mouse.state[4] = False
     mouse.pos = pygame.mouse.get_pos()
     
-    playButton.draw()
+    play_button.draw()
 
     pygame.display.update()
     clock.tick(60)
