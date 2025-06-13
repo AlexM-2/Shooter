@@ -14,7 +14,9 @@ while True:
             pygame.quit()
             raise SystemExit
     
-    screen.fill((0,0,0))
+    screen.fill((255, 255, 255))
+
+    pygame.draw.rect(screen, pygame.color.Color(255, 0, 0, ), (10, 50, 100, 150))
 
     pygame.display.update()
     clock.tick(60)
