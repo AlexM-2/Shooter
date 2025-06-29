@@ -140,7 +140,7 @@ player = Sprite(pygame.Surface((100, 100)), (0,0))
 on_menu_screen = True
 activated = False
 
-svg_test = SVG("Assets/dr.svg")
+svg_test = SVG("Assets/test.svg")
 print(f"{svg_test.rect2.width=} {svg_test.rect2.height=} {svg_test.rect2.x=} {svg_test.rect2.y=}")
 
 def menu_screen():
