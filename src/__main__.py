@@ -1,7 +1,6 @@
-import pygame
 import sys
-import xml.etree.ElementTree as ET
-from math import floor, ceil
+import pygame
+import svg_util
 
 pygame.init()
 
@@ -22,13 +21,6 @@ pygame.event.set_allowed(allowed_events)
 
 Vector2 = pygame.math.Vector2
 Color = pygame.color.Color
-
-def rd(n: float):
-    n = float(n)
-    if n % 1 < 0.5:
-        return floor(n)
-    else:
-        return ceil(n)
 
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, image: pygame.Surface, pos: Vector2, *groups):
@@ -58,73 +50,7 @@ class Sprite(pygame.sprite.Sprite):
         else:
             super().__setattr__(name, value)
 
-class Rect:
-    def __init__(self, width: int, height: int, x: int, y: int, r: int = 0, style: str = "none"):
-
-        self.width: int = width
-        self.height: int = height
-            
-        self.x: int = x
-        self.y: int = y
-
-        self.r: int = r
-
-        #converts style into a dictionary
-        if style == "none":
-            self.style = "none"
-        else:
-            self.style = {item.split(":")[0]: item.split(":")[1] for item in style.split(";")}
-    
-    def draw(self, output_surface: pygame.Surface):
-        pygame.draw.rect(output_surface, pygame.Color(self.style["fill"]), (self.x, self.y, self.width, self.height))
-
-class SVG:
-
-    def __init__(self, file_path: str):
-        self.tree = ET.parse(file_path)
-        self.root = self.tree.getroot()
-
-        #searching through the root's attributes
-        for attr_name, value in self.root.items():
-            if attr_name == "width":
-                self.width = value
-            elif attr_name == "height":
-                self.height = value
-        
-        #searching through the root's elements
-        def search_for_elements(root: ET.Element):
-            for element in root:
-                
-
-                element_tag = ""
-                n = 0
-                valid = False
-                for char in element.tag:
-                    if valid == True:
-                        element_tag+= char
-                    if char == "}":
-                        valid = True
-                    n+= 1
-
-                if element_tag == "g":
-                    search_for_elements(element)
-                elif element_tag == "rect":
-                    attribs = element.attrib
-                    element.__class__.__setattr__(
-                        self,
-                        attribs.get("id"), 
-                        Rect(
-                            rd(attribs.get("width", 50)),
-                            rd(attribs.get("height", 50)),
-                            rd(attribs.get("x", 0)),
-                            rd(attribs.get("y", 0)),
-                            rd(attribs.get("rx", 0)),
-                            attribs.get("style", "none")
-                        )
-                    )
-        
-        search_for_elements(self.root)
-
+surf = svg_util.render("Assets/test2.svg", "rect1")
 
 mouse_pos = pygame.mouse.get_pos()
 mouse_state = list(pygame.mouse.get_pressed(5))
@@ -139,9 +65,6 @@ player = Sprite(pygame.Surface((100, 100)), (0,0))
 
 on_menu_screen = True
 activated = False
-
-svg_test = SVG("Assets/test.svg")
-print(f"{svg_test.rect2.width=} {svg_test.rect2.height=} {svg_test.rect2.x=} {svg_test.rect2.y=}")
 
 def menu_screen():
     pygame.draw.rect(
@@ -186,8 +109,7 @@ def menu_screen():
         )
         activated = False
 
-    svg_test.rect1.draw(screen)
-
+    screen.blit(surf, (0, 0))
     play_button.image.blit(text, Vector2((play_button.size[0]/2) - (text.get_rect()[2]/2), (play_button.size[1]/2) - (text.get_rect()[3]/2)))
     screen.blit(play_button.image, play_button.rect)
 
