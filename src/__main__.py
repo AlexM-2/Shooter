@@ -50,72 +50,60 @@ class Sprite(pygame.sprite.Sprite):
         else:
             super().__setattr__(name, value)
 
-test_svg = svgutil.SVGFile("Assets/test.svg")
-rect = test_svg.tree.xpath("//svg:rect[@id='rect1']", namespaces=test_svg.ns)[0]
-rect.x = 400
-rect.height = 600
-surf = rect.render()
-
 mouse_pos = pygame.mouse.get_pos()
 mouse_state = list(pygame.mouse.get_pressed(5))
 mouse_velocity = (0, 0)
 
-font = pygame.font.Font("freesansbold.ttf", 30)
-text = font.render("Play Game", True, (0, 0, 0))
-
-play_button = Sprite(pygame.Surface((200, 100)), (300, 500))
-
-player = Sprite(pygame.Surface((100, 100)), (0,0))
+svg = svgutil.SVGFile("Assets/play_button.svg")
+play_button = svg.render()
 
 on_menu_screen = True
 activated = False
 
 def menu_screen():
-    pygame.draw.rect(
-        play_button.image,
-        (255, 255, 255),
-        (0, 0) + tuple(play_button.size),
-        border_radius=20
-    )
-    if play_button.rect.collidepoint(mouse_pos):
-        pygame.draw.rect(
-            play_button.image,
-            (175, 175, 175),
-            (10, 10) + (play_button.size[0] - 20, play_button.size[1] - 20),
-            border_radius=10
-        )
-        if mouse_state[0] == True:
-            pygame.draw.rect(
-                play_button.image,
-                (200, 200, 200),
-                (10, 10) + (play_button.size[0] - 20, play_button.size[1] - 20),
-                border_radius=10
-            )
-            global activated
-            activated = True
-        else:
-            pygame.draw.rect(
-                play_button.image,
-                (175, 175, 175),
-                (10, 10) + (play_button.size[0] - 20, play_button.size[1] - 20),
-                border_radius=10
-            )
-            if activated == True:
-                global on_menu_screen
-                on_menu_screen = False
-                activated = False
-    else:
-        pygame.draw.rect(
-            play_button.image,
-            (125, 125, 125),
-            (10, 10) + (play_button.size[0] - 20, play_button.size[1] - 20),
-            border_radius=10
-        )
-        activated = False
+    # pygame.draw.rect(
+    #     play_button.image,
+    #     (255, 255, 255),
+    #     (0, 0) + tuple(play_button.size),
+    #     border_radius=20
+    # )
+    # if play_button.rect.collidepoint(mouse_pos):
+    #     pygame.draw.rect(
+    #         play_button.image,
+    #         (175, 175, 175),
+    #         (10, 10) + (play_button.size[0] - 20, play_button.size[1] - 20),
+    #         border_radius=10
+    #     )
+    #     if mouse_state[0] == True:
+    #         pygame.draw.rect(
+    #             play_button.image,
+    #             (200, 200, 200),
+    #             (10, 10) + (play_button.size[0] - 20, play_button.size[1] - 20),
+    #             border_radius=10
+    #         )
+    #         global activated
+    #         activated = True
+    #     else:
+    #         pygame.draw.rect(
+    #             play_button.image,
+    #             (175, 175, 175),
+    #             (10, 10) + (play_button.size[0] - 20, play_button.size[1] - 20),
+    #             border_radius=10
+    #         )
+    #         if activated == True:
+    #             global on_menu_screen
+    #             on_menu_screen = False
+    #             activated = False
+    # else:
+    #     pygame.draw.rect(
+    #         play_button.image,
+    #         (125, 125, 125),
+    #         (10, 10) + (play_button.size[0] - 20, play_button.size[1] - 20),
+    #         border_radius=10
+    #     )
+    #     activated = False
 
-    screen.blit(surf, (0, 0))
-    play_button.image.blit(text, Vector2((play_button.size[0]/2) - (text.get_rect()[2]/2), (play_button.size[1]/2) - (text.get_rect()[3]/2)))
-    screen.blit(play_button.image, play_button.rect)
+    screen.blit(play_button, (0, 0))
 
 def game():
     pass
@@ -123,8 +111,6 @@ def game():
 while True:
 
     screen.fill(SCREEN_COLOR)
-    play_button.image.fill(SCREEN_COLOR)
-    # screen.fill((125, 125, 125))
 
     all_events = pygame.event.get()
     for event in all_events:

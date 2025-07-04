@@ -218,6 +218,7 @@ class SVGFile:
 
             with open(out_path, "w") as out_svg_file:
                 out_svg_file.write(etree.tostring(self.tree, encoding= "unicode"))
+                print(etree.tostring(self.tree, encoding= "unicode"))
                 return out_path
 
         def get_png_from_svg(in_path: str):
