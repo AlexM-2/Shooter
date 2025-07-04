@@ -1,6 +1,6 @@
 import sys
 import pygame
-import svg_util
+import svgutil
 
 pygame.init()
 
@@ -50,7 +50,11 @@ class Sprite(pygame.sprite.Sprite):
         else:
             super().__setattr__(name, value)
 
-surf = svg_util.render("Assets/test2.svg", "rect1")
+test_svg = svgutil.SVGFile("Assets/test.svg")
+rect = test_svg.tree.xpath("//svg:rect[@id='rect1']", namespaces=test_svg.ns)[0]
+rect.x = 400
+rect.height = 600
+surf = rect.render()
 
 mouse_pos = pygame.mouse.get_pos()
 mouse_state = list(pygame.mouse.get_pressed(5))
