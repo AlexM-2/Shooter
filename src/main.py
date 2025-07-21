@@ -1,9 +1,12 @@
-import pyglet
+from pyglet.window import Window
+from pyglet.window.key import KeyStateHandler
+from pyglet.window.mouse import MouseStateHandler
+from pyglet.app import run
 
-window = pyglet.window.Window(800, 800) #creates a window
+window = Window(800, 800) #creates a window
 
-keyboard = pyglet.window.key.KeyStateHandler() #creates a handler that keeps track of key presses
-mouse = pyglet.window.mouse.MouseStateHandler() #creates a handler that keeps track of when the mouse is clicked
+keyboard = KeyStateHandler() #creates a handler that keeps track of key presses
+mouse = MouseStateHandler() #creates a handler that keeps track of when the mouse is clicked
 
 window.push_handlers(keyboard, mouse) #adds the mouse and keyboard handlers to the window so they can be used
 
@@ -12,4 +15,4 @@ def on_draw():
     print(keyboard.data)
     print(mouse.data)
 
-pyglet.app.run() #run the game
+run() #run the game
